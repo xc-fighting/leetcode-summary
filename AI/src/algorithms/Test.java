@@ -24,15 +24,11 @@ public class Test {
 		GraphPath gp=new GraphPath();
 		List<List<Integer>> paths=gp.pathFind(edges, 1, 4);
 		gp.print(paths);*/
-		try {
-			new homework().parseInput();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	        homework hw=new homework();
+			hw.parseInput();
+			hw.selector();
+			hw.runDFS();
+		    hw.generateOutput();
 
 	}
 }
