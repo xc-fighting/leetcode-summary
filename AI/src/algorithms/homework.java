@@ -126,24 +126,89 @@ public class homework {
 		  }
 	}
 	
+	public boolean check(int row,int col,List<int[]> positions){
+		for(int[] pos:positions){
+			//appear in the same row
+			if(pos[0]==row){
+				int[] Tpos=new int[]{-1,-1};
+				//if there is a tree which has same row as cur
+				for(int i=0;i<TreePos.size();i++){
+					if(TreePos.get(i)[0]==row){
+						Tpos[0]=TreePos.get(i)[0];
+						Tpos[1]=TreePos.get(i)[1];
+						break;
+					}
+				}
+				if(Tpos[0]==-1){
+					return false;
+				}
+				else{
+					if((Tpos[1]-col)*(Tpos[1]-pos[1])>0)return false;
+				}
+			}
+			//appear in the same col
+			if(pos[1]==col){
+				int[] Tpos=new int[]{-1,-1};
+				//judge whether there is a tree which has the same col
+				for(int i=0;i<TreePos.size();i++){
+					if(TreePos.get(i)[1]==col){
+						Tpos[0]=TreePos.get(i)[0];
+						Tpos[1]=TreePos.get(i)[1];
+						break;
+					}
+				}
+				if(Tpos[0]==-1)return false;
+				else{
+					if((Tpos[0]-row)*(Tpos[0]-pos[0])>0)return false;
+				}
+			}
+			if(pos[0]+pos[1]==row+col){
+				int[] Tpos=new int[]{-1,-1};
+				//judge whether there is a tree which has the same col
+				for(int i=0;i<TreePos.size();i++){
+					if(TreePos.get(i)[1]+TreePos.get(i)[0]==col+row){
+						Tpos[0]=TreePos.get(i)[0];
+						Tpos[1]=TreePos.get(i)[1];
+						break;
+					}
+				}
+				if(Tpos[0]==-1)return false;
+				else{
+					if((Tpos[1]-col)*(Tpos[1]-pos[1])>0)return false;
+				}
+			}
+			if(pos[0]-pos[1]==row-col){
+				int[] Tpos=new int[]{-1,-1};
+				//judge whether there is a tree which has the same col
+				for(int i=0;i<TreePos.size();i++){
+					if(TreePos.get(i)[0]-TreePos.get(i)[1]==row-col){
+						Tpos[0]=TreePos.get(i)[0];
+						Tpos[1]=TreePos.get(i)[1];
+						break;
+					}
+				}
+				if(Tpos[0]==-1)return false;
+				else{
+					if((Tpos[1]-col)*(Tpos[1]-pos[1])>0)return false;
+				}
+			}
+		}
+		return true;
+	}
 	//input is the 2d array and output is a 2d array too
 	//first consider the condition of no trees
 	//diagnal1 is from top right to bottom left
-	boolean[] col,diagnal1,diagnal2;
+
 	
 	
 	public void runDFS(){
 		//initialize the map for that
-		col=new boolean[Width];
-		diagnal1=new boolean[2*Width-1];
-		diagnal2=new boolean[2*Width-1];
-		
 		List<int[]> positions=new ArrayList<int[]>();
-		putLizard(0,positions);
+		putLizard(0,0,positions);
 	}
 	
-	//try to put a lizard in index th row
-	void putLizard(int index,List<int[]> positions){
+	//try to put a lizard in position(row,col)
+	void putLizard(int row,int col,List<int[]> positions){
 		//set the sign of isSuccess in order to guarantee return and not search any more if you find it.
 		  if(isSuccess==true)return;
 		 // we can conclude that we find the solution if we got current number of lizards position equals num of lizard
@@ -152,20 +217,19 @@ public class homework {
 			  print(outputMatrix);
 			  isSuccess=true;
 			  return;
-		  }
-		  if(index>=Width)return;
-		  for(int i=0;i<Width;i++){
-			  if(matrix[index][i]=='2'||matrix[index][i]=='1')continue;
-			  if(col[i]==false && diagnal1[index+i]==false && diagnal2[index-i+Width-1]==false){
-					  positions.add(new int[]{index,i});
-					  col[i]=true;
-					  diagnal1[index+i]=true;
-					  diagnal2[index-i+Width-1]=true;
-					  putLizard(index+1,positions);
-					  col[i]=false;
-					  diagnal1[index+i]=false;
-					  diagnal2[index-i+Width-1]=false;
-					  positions.remove(positions.size()-1);				  
+		  }		  
+		  if(row>=Width)return;
+		  for(int i=col;i<Width;i++){
+			  if(matrix[row][i]=='2')continue;
+			  if(check(row,i,positions)){
+					  positions.add(new int[]{row,i});				 
+					  putLizard(row+1,0,positions);
+					  positions.remove(positions.size()-1);	
+					  
+					  positions.add(new int[]{row,i});
+					  putLizard(row,col+1,positions);
+					  positions.remove(positions.size()-1);
+					  
 				}		  
 		  }
 		  
