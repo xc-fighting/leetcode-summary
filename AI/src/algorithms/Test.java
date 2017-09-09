@@ -27,7 +27,7 @@ public class Test {
 	        homework hw=new homework();
 			hw.parseInput();
 			hw.selector();
-			hw.runDFS();
+		//	hw.runDFS();
 		    hw.generateOutput();
 
 	}
