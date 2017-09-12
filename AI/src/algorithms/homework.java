@@ -6,7 +6,10 @@ import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
+import java.util.Scanner;
 
 /*
  * input case:
@@ -124,6 +127,7 @@ public class homework {
 			  }
             System.out.println();
 		  }
+		
 	}
 	
 	public boolean check(int row,int col,List<int[]> positions){
@@ -235,10 +239,59 @@ public class homework {
 		  
 	}
 	
+	Queue<List<int[]>> bfsQueue=new LinkedList<List<int[]>>();
 	
-	
+	//consider the condition without tree first.
 	public void runBFS(){
-		
+		//first initialize for the first level
+		for(int i=0;i<Width;i++){
+			if(matrix[0][i]=='2')continue;
+			List<int[]> temp=new ArrayList<int[]>();
+			int[] pos=new int[]{0,i};
+			temp.add(pos);
+			bfsQueue.add(temp);
+		}
+		//then find the solution of the problem
+		int level=0;
+		while(bfsQueue.isEmpty()==false){
+			//we get the initial size of queue,we name it as size which is number of nodes in current level
+			int size=bfsQueue.size();
+			//then we pop it one by one from the queue
+			for(int i=0;i<size;i++){
+				List<int[]> poslist=bfsQueue.poll();
+				if(level+1<Width){
+					for(int j=0;j<Width;j++){
+						if(matrix[level+1][j]=='2')continue;
+						if(check(level+1,j,poslist)==true){
+							int[] newpos=new int[]{level+1,j};
+							poslist.add(newpos);
+							//the pre judge condition of end the algorithm
+							if(poslist.size()==NumOfLizard){
+								//make the output matrix
+								makeOutPutMatrix(poslist);
+								print(outputMatrix);
+								isSuccess=true;
+								return;
+							}
+							List<int[]> newlist=new ArrayList<int[]>(poslist);							
+							bfsQueue.offer(newlist);
+						}
+						else continue;
+					}
+					
+				}
+				else{
+					if(poslist.size()==NumOfLizard){
+						makeOutPutMatrix(poslist);
+						isSuccess=true;
+						return;
+					}
+					return;
+				}
+				
+			}
+			level++;
+		}
 	}
 	
 	public void runSA(){
