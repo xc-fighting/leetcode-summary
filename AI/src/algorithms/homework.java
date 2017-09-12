@@ -131,6 +131,7 @@ public class homework {
 	}
 	
 	public boolean check(int row,int col,List<int[]> positions){
+		
 		for(int[] pos:positions){
 			//appear in the same row
 			if(pos[0]==row){
@@ -258,36 +259,74 @@ public class homework {
 			int size=bfsQueue.size();
 			//then we pop it one by one from the queue
 			for(int i=0;i<size;i++){
+				
 				List<int[]> poslist=bfsQueue.poll();
+				if(poslist.size()==NumOfLizard){
+					makeOutPutMatrix(poslist);
+					print(outputMatrix);
+					isSuccess=true;
+					return;
+				}
+				//first we try for the same level
+				for(int[] pos:poslist){
+					
+					int row=pos[0];
+					int col=pos[1];
+					
+					for(int index=col+1;index<Width;index++){
+						
+						if(matrix[row][index]=='2')continue;
+						//if it can be place in the current row,then place it
+						if(check(row,index,poslist)){
+							
+							List<int[]> newlist=new ArrayList<int[]>(poslist);
+							newlist.add(new int[]{row,index});
+							if(newlist.size()==NumOfLizard){
+								makeOutPutMatrix(newlist);
+								print(outputMatrix);
+								isSuccess=true;
+								return;
+							}
+							
+							bfsQueue.offer(newlist);
+							
+						}
+						else continue;
+						
+					}
+				}
+				
+				//then we try for the next level
 				if(level+1<Width){
 					for(int j=0;j<Width;j++){
 						if(matrix[level+1][j]=='2')continue;
 						if(check(level+1,j,poslist)==true){
-							int[] newpos=new int[]{level+1,j};
-							poslist.add(newpos);
+							int[] newpos=new int[]{level+1,j};				
 							//the pre judge condition of end the algorithm
-							if(poslist.size()==NumOfLizard){
+							if(poslist.size()+1==NumOfLizard){
 								//make the output matrix
+								poslist.add(newpos);
 								makeOutPutMatrix(poslist);
 								print(outputMatrix);
 								isSuccess=true;
 								return;
 							}
-							List<int[]> newlist=new ArrayList<int[]>(poslist);							
+							List<int[]> newlist=new ArrayList<int[]>(poslist);	
+							newlist.add(newpos);
 							bfsQueue.offer(newlist);
 						}
 						else continue;
 					}
 					
 				}
-				else{
+			/*	else{
 					if(poslist.size()==NumOfLizard){
 						makeOutPutMatrix(poslist);
 						isSuccess=true;
 						return;
 					}
 					return;
-				}
+				}*/
 				
 			}
 			level++;
