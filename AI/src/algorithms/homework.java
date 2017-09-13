@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Scanner;
 
 /*
@@ -231,9 +232,12 @@ public class homework {
 					  putLizard(row+1,0,positions);
 					  positions.remove(positions.size()-1);	
 					  
-					  positions.add(new int[]{row,i});
-					  putLizard(row,col+1,positions);
-					  positions.remove(positions.size()-1);
+					  if(hasTree==true){
+						  positions.add(new int[]{row,i});
+						  putLizard(row,col+1,positions);
+						  positions.remove(positions.size()-1);
+					  }
+					  
 					  
 				}		  
 		  }
@@ -267,34 +271,38 @@ public class homework {
 					isSuccess=true;
 					return;
 				}
-				//first we try for the same level
-				for(int[] pos:poslist){
-					
-					int row=pos[0];
-					int col=pos[1];
-					
-					for(int index=col+1;index<Width;index++){
+				
+				if(hasTree==true){
+					//first we try for the same level
+					for(int[] pos:poslist){
 						
-						if(matrix[row][index]=='2')continue;
-						//if it can be place in the current row,then place it
-						if(check(row,index,poslist)){
+						int row=pos[0];
+						int col=pos[1];
+						
+						for(int index=col+1;index<Width;index++){
 							
-							List<int[]> newlist=new ArrayList<int[]>(poslist);
-							newlist.add(new int[]{row,index});
-							if(newlist.size()==NumOfLizard){
-								makeOutPutMatrix(newlist);
-								print(outputMatrix);
-								isSuccess=true;
-								return;
+							if(matrix[row][index]=='2')continue;
+							//if it can be place in the current row,then place it
+							if(check(row,index,poslist)){
+								
+								List<int[]> newlist=new ArrayList<int[]>(poslist);
+								newlist.add(new int[]{row,index});
+								if(newlist.size()==NumOfLizard){
+									makeOutPutMatrix(newlist);
+									print(outputMatrix);
+									isSuccess=true;
+									return;
+								}
+								
+								bfsQueue.offer(newlist);
+								
 							}
-							
-							bfsQueue.offer(newlist);
+							else continue;
 							
 						}
-						else continue;
-						
 					}
 				}
+				
 				
 				//then we try for the next level
 				if(level+1<Width){
@@ -333,8 +341,160 @@ public class homework {
 		}
 	}
 	
+	float eps=0.00000001f;
+	float delta=0.98f;
+	float T=100.0f;
+	Random seed=new Random();
+	public boolean checkValidPlace(int rowIndex,int colIndex,List<int[]> poslist){
+		if(rowIndex<0||rowIndex>=Width||colIndex<0||colIndex>=Width)return false;
+		if(matrix[rowIndex][colIndex]=='2')return false;
+		for(int i=0;i<poslist.size();i++){
+			int[] pos=poslist.get(i);
+			if(matrix[pos[0]][pos[1]]=='1')return false;
+		}
+		return true;
+	}
+	public int value(List<int[]> poslist){
+		int conflict=0;
+		for(int i=0;i<poslist.size()-1;i++){
+			for(int j=i+1;j<poslist.size();j++){
+				//appear in the same row
+				int rowi=poslist.get(i)[0];
+				int rowj=poslist.get(j)[0];
+				int coli=poslist.get(i)[1];
+				int colj=poslist.get(j)[1];
+				if(rowi==rowj){
+					int[] Tpos=new int[]{-1,-1};
+					//if there is a tree which has same row as cur
+					for(int index=0;index<TreePos.size();index++){
+						if(TreePos.get(i)[0]==rowi){
+							Tpos[0]=TreePos.get(i)[0];
+							Tpos[1]=TreePos.get(i)[1];
+							break;
+						}
+					}
+					if(Tpos[0]==-1){
+						conflict++;
+					}
+					else{
+						if((Tpos[1]-coli)*(Tpos[1]-colj)>0)
+							conflict++;
+					}
+				}
+				//appear in the same col
+				if(coli==colj){
+					int[] Tpos=new int[]{-1,-1};
+					//judge whether there is a tree which has the same col
+					for(int index=0;index<TreePos.size();index++){
+						if(TreePos.get(i)[1]==coli){
+							Tpos[0]=TreePos.get(i)[0];
+							Tpos[1]=TreePos.get(i)[1];
+							break;
+						}
+					}
+					if(Tpos[0]==-1)conflict++;
+					else{
+						if((Tpos[0]-rowi)*(Tpos[0]-rowj)>0)conflict++;
+					}
+				}
+				if(rowi+coli==rowj+colj){
+					int[] Tpos=new int[]{-1,-1};
+					//judge whether there is a tree which has the same col
+					for(int index=0;index<TreePos.size();index++){
+						if(TreePos.get(i)[1]+TreePos.get(i)[0]==rowi+coli){
+							Tpos[0]=TreePos.get(i)[0];
+							Tpos[1]=TreePos.get(i)[1];
+							break;
+						}
+					}
+					if(Tpos[0]==-1)conflict++;
+					else{
+						if((Tpos[1]-coli)*(Tpos[1]-colj)>0)conflict++;
+					}
+				}
+				if(rowj-colj==rowi-coli){
+					int[] Tpos=new int[]{-1,-1};
+					//judge whether there is a tree which has the same col
+					for(int index=0;index<TreePos.size();index++){
+						if(TreePos.get(i)[0]-TreePos.get(i)[1]==rowi-coli){
+							Tpos[0]=TreePos.get(i)[0];
+							Tpos[1]=TreePos.get(i)[1];
+							break;
+						}
+					}
+					if(Tpos[0]==-1)conflict++;
+					else{
+						if((Tpos[1]-coli)*(Tpos[1]-colj)>0)conflict++;
+					}
+				}
+			}
+		}
+		return conflict;
+	}
+	int[][] directions={
+			{0,1},
+			{0,-1},
+			{1,0},
+			{-1,0},
+			{1,1},
+			{1,-1},
+			{-1,1},
+			{-1,-1}
+	};
+	public boolean judge(float p){
+		float v=seed.nextInt(1);
+		if(v<=p)return true;
+		else return false;
+	}
 	public void runSA(){
-		
+		List<int[]> lizardpos=new ArrayList<int[]>();
+		//first initialize for the board
+		for(int i=0;i<NumOfLizard;){
+			int rowIndex=seed.nextInt(Width);
+			int colIndex=seed.nextInt(Width);
+			if(checkValidPlace(rowIndex,colIndex,lizardpos)){
+				lizardpos.add(new int[]{rowIndex,colIndex});
+				i++;
+			}
+			else continue;
+			
+		}
+		//then we get the list of lizard positions 
+		float t=T;
+		while(t>eps){
+			int curValue=value(lizardpos);
+			if(curValue<=eps){
+				makeOutPutMatrix(lizardpos);
+				print(outputMatrix);
+				isSuccess=true;
+				return;
+			}
+			//select random lizard
+			int index=seed.nextInt(lizardpos.size());
+			//and make random valid move.
+			int dirIndex=seed.nextInt(8);
+			int row=lizardpos.get(index)[0]+directions[dirIndex][0];
+			int col=lizardpos.get(index)[1]+directions[dirIndex][1];
+			while(checkValidPlace(row,col,lizardpos)==false){
+				dirIndex=seed.nextInt(8);
+				row=lizardpos.get(index)[0]+directions[dirIndex][0];
+				col=lizardpos.get(index)[1]+directions[dirIndex][1];
+			}
+			int prerow=lizardpos.get(index)[0];
+			int precol=lizardpos.get(index)[1];
+			lizardpos.get(index)[0]=row;
+			lizardpos.get(index)[1]=col;
+			int nextValue=value(lizardpos);
+			int E=nextValue-curValue;
+			if(E>0){
+				float p=(float) Math.exp(-E/t);
+				if(judge(p)==false){
+					lizardpos.get(index)[0]=prerow;
+					lizardpos.get(index)[1]=precol;
+				}
+			}
+			t=t*delta;
+		}
 	}
 	
 	
