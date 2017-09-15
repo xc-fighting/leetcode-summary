@@ -350,7 +350,8 @@ public class homework {
 		if(matrix[rowIndex][colIndex]=='2')return false;
 		for(int i=0;i<poslist.size();i++){
 			int[] pos=poslist.get(i);
-			if(matrix[pos[0]][pos[1]]=='1')return false;
+			
+			if(pos[0]==rowIndex && pos[1]==colIndex)return false;
 		}
 		return true;
 	}
@@ -367,9 +368,9 @@ public class homework {
 					int[] Tpos=new int[]{-1,-1};
 					//if there is a tree which has same row as cur
 					for(int index=0;index<TreePos.size();index++){
-						if(TreePos.get(i)[0]==rowi){
-							Tpos[0]=TreePos.get(i)[0];
-							Tpos[1]=TreePos.get(i)[1];
+						if(TreePos.get(index)[0]==rowi){
+							Tpos[0]=TreePos.get(index)[0];
+							Tpos[1]=TreePos.get(index)[1];
 							break;
 						}
 					}
@@ -386,9 +387,9 @@ public class homework {
 					int[] Tpos=new int[]{-1,-1};
 					//judge whether there is a tree which has the same col
 					for(int index=0;index<TreePos.size();index++){
-						if(TreePos.get(i)[1]==coli){
-							Tpos[0]=TreePos.get(i)[0];
-							Tpos[1]=TreePos.get(i)[1];
+						if(TreePos.get(index)[1]==coli){
+							Tpos[0]=TreePos.get(index)[0];
+							Tpos[1]=TreePos.get(index)[1];
 							break;
 						}
 					}
@@ -401,9 +402,9 @@ public class homework {
 					int[] Tpos=new int[]{-1,-1};
 					//judge whether there is a tree which has the same col
 					for(int index=0;index<TreePos.size();index++){
-						if(TreePos.get(i)[1]+TreePos.get(i)[0]==rowi+coli){
-							Tpos[0]=TreePos.get(i)[0];
-							Tpos[1]=TreePos.get(i)[1];
+						if(TreePos.get(index)[1]+TreePos.get(index)[0]==rowi+coli){
+							Tpos[0]=TreePos.get(index)[0];
+							Tpos[1]=TreePos.get(index)[1];
 							break;
 						}
 					}
@@ -416,9 +417,9 @@ public class homework {
 					int[] Tpos=new int[]{-1,-1};
 					//judge whether there is a tree which has the same col
 					for(int index=0;index<TreePos.size();index++){
-						if(TreePos.get(i)[0]-TreePos.get(i)[1]==rowi-coli){
-							Tpos[0]=TreePos.get(i)[0];
-							Tpos[1]=TreePos.get(i)[1];
+						if(TreePos.get(index)[0]-TreePos.get(index)[1]==rowi-coli){
+							Tpos[0]=TreePos.get(index)[0];
+							Tpos[1]=TreePos.get(index)[1];
 							break;
 						}
 					}
@@ -431,70 +432,72 @@ public class homework {
 		}
 		return conflict;
 	}
-	int[][] directions={
-			{0,1},
-			{0,-1},
-			{1,0},
-			{-1,0},
-			{1,1},
-			{1,-1},
-			{-1,1},
-			{-1,-1}
-	};
+	
 	public boolean judge(float p){
 		float v=seed.nextInt(1);
 		if(v<=p)return true;
 		else return false;
 	}
+	//the way is you need to random select one node and place it randomly into the chess board into random valid position
+	//because when you set the pattern and directions of lizard it may stuck into some pattern 
 	public void runSA(){
-		List<int[]> lizardpos=new ArrayList<int[]>();
-		//first initialize for the board
-		for(int i=0;i<NumOfLizard;){
-			int rowIndex=seed.nextInt(Width);
-			int colIndex=seed.nextInt(Width);
-			if(checkValidPlace(rowIndex,colIndex,lizardpos)){
-				lizardpos.add(new int[]{rowIndex,colIndex});
-				i++;
-			}
-			else continue;
-			
-		}
-		//then we get the list of lizard positions 
-		float t=T;
-		while(t>eps){
-			int curValue=value(lizardpos);
-			if(curValue<=eps){
-				makeOutPutMatrix(lizardpos);
-				print(outputMatrix);
-				isSuccess=true;
-				return;
-			}
-			//select random lizard
-			int index=seed.nextInt(lizardpos.size());
-			//and make random valid move.
-			int dirIndex=seed.nextInt(8);
-			int row=lizardpos.get(index)[0]+directions[dirIndex][0];
-			int col=lizardpos.get(index)[1]+directions[dirIndex][1];
-			while(checkValidPlace(row,col,lizardpos)==false){
-				dirIndex=seed.nextInt(8);
-				row=lizardpos.get(index)[0]+directions[dirIndex][0];
-				col=lizardpos.get(index)[1]+directions[dirIndex][1];
-			}
-			int prerow=lizardpos.get(index)[0];
-			int precol=lizardpos.get(index)[1];
-			lizardpos.get(index)[0]=row;
-			lizardpos.get(index)[1]=col;
-			int nextValue=value(lizardpos);
-			int E=nextValue-curValue;
-			if(E>0){
-				float p=(float) Math.exp(-E/t);
-				if(judge(p)==false){
-					lizardpos.get(index)[0]=prerow;
-					lizardpos.get(index)[1]=precol;
+		int num=0;
+		while(num<1000000){
+			List<int[]> lizardpos=new ArrayList<int[]>();
+			//first initialize for the board
+			for(int i=0;i<NumOfLizard;){
+				int rowIndex=seed.nextInt(Width);
+				int colIndex=seed.nextInt(Width);
+				if(checkValidPlace(rowIndex,colIndex,lizardpos)){
+					lizardpos.add(new int[]{rowIndex,colIndex});
+					i++;
 				}
+				else continue;
+				
 			}
-			t=t*delta;
+			//then we get the list of lizard positions 
+			float t=T;
+			int curValue=Integer.MAX_VALUE;
+			while(t>eps){
+				curValue=value(lizardpos);
+				if(curValue<=eps){
+					makeOutPutMatrix(lizardpos);
+					print(outputMatrix);
+					isSuccess=true;
+					return;
+				}
+				//select random lizard
+				int index=seed.nextInt(NumOfLizard);
+				//and make random valid move.
+				int prerow=lizardpos.get(index)[0];
+				int precol=lizardpos.get(index)[1];
+				
+				int row=seed.nextInt(Width);
+				int col=seed.nextInt(Width);
+				while((row==prerow&&col==precol) ||checkValidPlace(row,col,lizardpos)==false){
+					
+					row=seed.nextInt(Width);
+					col=seed.nextInt(Width);
+				}
+				
+				lizardpos.get(index)[0]=row;
+				lizardpos.get(index)[1]=col;
+				int nextValue=value(lizardpos);
+				int E=nextValue-curValue;
+				if(E>0){
+					float p=(float) Math.exp(-E/t);
+					if(judge(p)==false){
+						lizardpos.get(index)[0]=prerow;
+						lizardpos.get(index)[1]=precol;
+					}
+				}
+				t=t*delta;
+			}
+			num++;
 		}
+		
+			
+		
 	}
 	
 	
