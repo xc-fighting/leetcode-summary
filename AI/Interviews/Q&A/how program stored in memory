@@ -1,0 +1,3 @@
+the program in main memory like below:
+text segment to store the infor of program text
+initialized data part store the data of variables

@@ -1,0 +1,97 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Random;
+import java.util.Set;
+public class homework2 {
+	
+	char[][] matrix=null;
+	char[][] outputMatrix=null;
+	String filename="input.txt";
+	
+	
+
+	public homework2(){
+		
+	}
+	public static void main(String[] args){
+		 homework2 hw=new homework2();
+			hw.parseInput();
+			
+		
+		    hw.generateOutput();
+	}
+	
+	//step1
+	public void parseInput(){
+		try{
+			BufferedReader input=new BufferedReader(new FileReader(filename));
+			algorithmType=input.readLine();
+			Width=Integer.parseInt(input.readLine());
+			NumOfLizard=Integer.parseInt(input.readLine());
+			matrix=new char[Width][Width];
+			outputMatrix=new char[Width][Width];
+		
+			String line="";
+			int index=0;
+			while((line=input.readLine())!=null){
+				for(int i=0;i<Width;i++){		
+					matrix[index][i]=line.charAt(i);
+					
+					if(matrix[index][i]=='2'){
+						//add four information of a tree
+						hasTree=true;
+						//TreePos.add(new int[]{index,i});
+						
+						Trow.get(index).add(i);
+						Tcol.get(i).add(index);
+						Tdiag1.get(index+i).add(i);
+						Tdiag2.get(index-i).add(i);	
+							
+					}
+					outputMatrix[index][i]=line.charAt(i);
+				}
+				index++;
+			}
+			input.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+	
+	//step 3
+	public void generateOutput(){
+		try{
+			BufferedWriter output=new BufferedWriter(new FileWriter("output.txt"));
+			String heading="";
+			if(isSuccess){
+				heading="OK";
+				output.write(heading+"\n");
+				for(int i=0;i<Width;i++){
+					String temp=new String(outputMatrix[i]);
+					output.write(temp+"\n");
+				}
+			}
+			else {
+				heading="FAIL";
+				output.write(heading+"\n");
+			}
+			output.close();
+		}
+		catch(Exception e){
+			e.printStackTrace();
+		}
+		
+	}
+
+}

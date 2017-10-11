@@ -1,0 +1,5 @@
+how is a map stored in c++:
+map in c++ stl is implemented using a self balacing
+binary search tree
+which ensure O(log n) time complexity for search,insert and delete
+operation.

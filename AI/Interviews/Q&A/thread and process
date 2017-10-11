@@ -1,0 +1,11 @@
+thread is the path of execution within a process
+ a process can contain multiple threads
+ the threads within the same process run in a shared 
+ memory space while processes run in seperate memory spaces
+ threads are not independent of one other like processes
+ 
+ when two thread access the code in the same time 
+ it caused race condition for example when two 
+ thread access a global static variable and add it the 
+ same time it may be wrong ,one of the solution is add the 
+ synchronized lock
