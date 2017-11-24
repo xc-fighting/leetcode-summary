@@ -79,6 +79,7 @@ public class verticalSum {
 		root.right.right=vs.new TreeNode(6);
 		System.out.println(vs.getVerticalSum(5, root));
 		
+		
 	}
 
 }

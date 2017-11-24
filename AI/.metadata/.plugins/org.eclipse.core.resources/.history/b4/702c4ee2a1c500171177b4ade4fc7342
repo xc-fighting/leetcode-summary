@@ -1,0 +1,68 @@
+package OnlineAssessment;
+import java.io.*;
+import java.util.*;
+public class SlidingWindow {
+
+	int calculate(int[] input,int start,int end){
+		int maxIndex=-1;
+		for(int i=start;i<=end;i++){
+			if(maxIndex==-1){
+				maxIndex=i;
+			}
+			if(input[i]>input[maxIndex]){
+				maxIndex=i;
+			}
+		}
+		return maxIndex;
+	}
+
+	public int[] getMax(int[] input,int k){
+		 if(input==null||input.length==0){
+		 	 return new int[0];
+		 }
+		 LinkedList<Integer> deque=new LinkedList<Integer>();
+		 //first we assume the k size is less than length of array
+		 int maxIndex=-1;
+		 for(int i=0;i<k;i++){
+		 	 if(maxIndex==-1){
+		 	 	maxIndex=i;
+		 	 }
+		 	 deque.offer(i);
+		 	 if(input[i]>input[maxIndex]){
+		 	 	maxIndex=i;
+		 	 }
+		 }
+		 int[] result=new int[input.length];
+		 result[0]=input[maxIndex];
+		 int index=0;
+		 while(index<=input.length-1){
+		 	deque.removeFirst();
+            index++;
+            if(index<maxIndex){
+            	
+            	if(index+k-1<=input.length-1){
+            		deque.offerLast(index+k-1);
+            		if(input[index+k-1]>input[maxIndex]){
+            			maxIndex=index+k-1;
+            		}
+            	}
+            	
+            }
+            else{
+            	//recalculate the max index
+                if(index+k-1<=input.length-1){
+            		deque.offerLast(index+k-1);
+            		maxIndex=calculate(input,index,index+k-1);
+            	}
+            }
+		 	result[index]=input[maxIndex];
+		 }
+        return result;
+	}
+
+	public static void main(String[] args){
+           SlidingWindow test=new SlidingWindow();
+           int[] input={1,3,5,7,3,4,2,9};
+           System.out.println(test.getMax(input,3));
+	}
+}

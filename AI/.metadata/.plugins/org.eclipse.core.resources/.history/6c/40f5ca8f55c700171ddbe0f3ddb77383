@@ -1,0 +1,13 @@
+import java.io.File;
+
+public class ExtractLinks {
+   
+	
+	public static void main(String[] args){
+		String dirpath="C:\\Users\\xuchen\\Desktop\\CRAWL\\USA Today";
+		File dir=new File(dirpath);
+		for(File file:dir.listFiles()){
+			System.out.println(file.getName());
+		}
+	}
+}
